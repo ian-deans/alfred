@@ -4,10 +4,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" value="width=device-width, intial-scale=1" />
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
 
   <!-- // Development firebase library -->
   <script src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 
   <!-- // VueJS development library -->
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -21,10 +23,7 @@
     </header>
 
     <nav id="navbar">
-      <nav-item
-        v-for="link in links"
-        v-bind:link="link"
-        v-bind:key="link.text">
+      <nav-item v-for="link in links" v-bind:link="link" v-bind:key="link.text">
       </nav-item>
     </nav>
     <aside id="left-panel" class="side-panel">
@@ -35,10 +34,7 @@
       </section>
       <section id="menu-panel">
         <div id="menu">
-          <menu-item
-            v-for="label in labels"
-            v-bind:label="label"
-            v-bind:key="label">
+          <menu-item v-for="label in labels" v-bind:label="label" v-bind:key="label">
           </menu-item>
       </section>
     </aside>
@@ -46,8 +42,12 @@
       <div></div>
     </main>
     <aside id="right-panel" class="side-panel">
-      <article>News</article>
-      <article>News</article>
+      <article>
+        <button id="authorize-button">Signin</button>
+      </article>
+      <article>
+        <button id="signout-button">SignOut</button>
+      </article>
       <article>News</article>
       <article>News</article>
       <article>News</article>
@@ -56,7 +56,9 @@
 
     <footer></footer>
   </div>
-  <script src="assets/app.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="app.js"></script>
+
 </body>
 
 </html>

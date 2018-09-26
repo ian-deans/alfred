@@ -5,22 +5,36 @@ const MENU_ITEMS = [
   "Roster"
 ]
 
+const today = moment().startOf('day').format();
+const endOfDay = moment().endOf('day').format();
 
+console.log(today)
+
+const CALENDAR_API_URL =
+  `https://www.googleapis.com/calendar/v3/calendars/hnng0croa7kvcpuv22ah54ea20@group.calendar.google.com/events?timeMin=${today}&timeMax=${endOfDay}`;
+const gapiInit = {
+    'apiKey': 'AIzaSyB1LJJJWWayc8A6U-OLt_C4d4FG5bO78c8',
+    'clientId': '337358217627-io7oq95ddglvt64ca2lkpj6o4iljce8s.apps.googleusercontent.com',
+    'scope': 'https://www.googleapis.com/auth/calendar.readonly',
+}
+
+// const authorizeButton = document.getElementById('authorize-button');
+// const signoutButton = document.getElementById('signout-button');
 
 connectFirebaseDB();
 const db = firebase.database();
 const usersdb = db.ref( 'users' );
 const linksdb = db.ref( 'links' );
-
 registerVueComponents();
+loadGoogleClient();
 
+// Create Vue UI elements
 const navBar = new Vue( {
   el: '#navbar',
   data: {
     links: []
   }
 } )
-
 const menu = new Vue( {
   el: '#menu',
   data: {
@@ -28,12 +42,7 @@ const menu = new Vue( {
   }
 } )
 
-
-
 loadFromDB()
-// seedLinks();
-// seedUser();
-
 
 
 /** FUNCTIONS **/
@@ -63,7 +72,10 @@ function processLinks( snapshot ) {
   let links = [];
   snapshot.forEach( linkObj => {
     link = linkObj.val()
-    links.push( { text: link.text, url: link.url } )
+    links.push( {
+      text: link.text,
+      url: link.url
+    } )
     sessionStorage.setItem( link.text, link.url )
   } )
   navBar.links = links;
@@ -78,19 +90,40 @@ function registerVueComponents() {
   Vue.component( 'menu-item', {
     props: [ 'label' ],
     template: '<span class="menu-item">{{ label }}</span>'
-  })
+  } )
 
 }
 
 function seedLinks() {
   const links = [
-    { url: 'https://github.com/ian-deans', text: 'GitHub' },
-    { url: 'https://calendly.com/dashboard', text: 'Calendly' },
-    { url: 'https://workforcenow.adp.com/public/index.htm', text: 'ADP' },
-    { url: 'https://www.linkedin.com/feed/', text: 'LinkedIn' },
-    { url: 'https://zoom.us/j/8501120243', text: 'Zoom Room' },
-    { url: 'https://secure.splitwise.com/#/dashboard', text: 'Splitwise' },
-    { url: 'https://docs.google.com/spreadsheets/d/1hUAW3JhzUb4MzyMTzxtNDRaORY2BO08je0N3SCX1E1c/edit#gid=0', text: 'Student Roster' },
+    {
+      url: 'https://github.com/ian-deans',
+      text: 'GitHub'
+    },
+    {
+      url: 'https://calendly.com/dashboard',
+      text: 'Calendly'
+    },
+    {
+      url: 'https://workforcenow.adp.com/public/index.htm',
+      text: 'ADP'
+    },
+    {
+      url: 'https://www.linkedin.com/feed/',
+      text: 'LinkedIn'
+    },
+    {
+      url: 'https://zoom.us/j/8501120243',
+      text: 'Zoom Room'
+    },
+    {
+      url: 'https://secure.splitwise.com/#/dashboard',
+      text: 'Splitwise'
+    },
+    {
+      url: 'https://docs.google.com/spreadsheets/d/1hUAW3JhzUb4MzyMTzxtNDRaORY2BO08je0N3SCX1E1c/edit#gid=0',
+      text: 'Student Roster'
+    },
   ]
 
   links.map( link => linksdb.push( link ) );
@@ -105,6 +138,54 @@ function seedUser() {
   usersdb.push( user )
   console.log( 'User seeded' );
 }
+
+
+
+function loadGoogleClient() {
+  gapi.load( 'client:auth2', initClient );
+}
+
+function initClient() {
+  gapi.client.init( gapiInit ).then( () =>
+    gapi.client.request( CALENDAR_API_URL ))
+  .then( response => {
+    console.log(response.result)
+  })
+}
+
+function updateSigninStatus( isSignedIn ) {
+  if ( isSignedIn ) {
+    authorizeButton.style.display = 'none';
+    signoutButton.style.display = 'block';
+    listUpcomingEvents();
+  } else {
+    authorizeButton.style.display = 'block';
+    signoutButton.style.display = 'none'
+  }
+}
+
+function handleAuthClick( event ) {
+  gapi.auth2.getAuthInstance().signIn();
+}
+
+function handleSignoutClick( event ) {
+  gapi.auth2.getAuthInstance().signOut();
+}
+
+function listUpcomingEvents() {
+  console.log(gapi.client)
+  gapi.client.calendar.events.list({
+    'calendarId': 'primary',
+    'showDeleted': false,
+    'singleEvents': true,
+    'maxResults': 10,
+  }).then( response => {
+    console.log( response )
+    let events = response.result.items;
+    console.log( events )
+  })
+}
+
 
 // var keys = []
 
