@@ -6,6 +6,12 @@
   <meta name="viewport" value="width=device-width, intial-scale=1" />
   <link rel="stylesheet" href="assets/style.css" />
 
+  <!-- // Development firebase library -->
+  <script src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script>
+
+  <!-- // VueJS development library -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
   <title>Alfred</title>
 </head>
 
@@ -14,24 +20,32 @@
     <header>
     </header>
 
-    <nav>
-      <a href="https://github.com/ian-deans" target="_blank">GitHub</a>
-      <a href="#">Link</a>
-      <a href="#">Link</a>
-      <a href="#">Link</a>
+    <nav id="navbar">
+      <nav-item
+        v-for="link in links"
+        v-bind:link="link"
+        v-bind:key="link.text">
+      </nav-item>
     </nav>
-    <aside id="leftside" class="news-bar">
-      <article>News</article>
-      <article>News</article>
-      <article>News</article>
-      <article>News</article>
-      <article>News</article>
-      <article>News</article>
+    <aside id="left-panel" class="side-panel">
+      <section id="calendar-panel">
+        <div id="calendar-container">
+          Google Calendar API
+        </div>
+      </section>
+      <section id="menu-panel">
+        <div id="menu">
+          <menu-item
+            v-for="label in labels"
+            v-bind:label="label"
+            v-bind:key="label">
+          </menu-item>
+      </section>
     </aside>
     <main>
       <div></div>
     </main>
-    <aside id="rightside" class="news-bar">
+    <aside id="right-panel" class="side-panel">
       <article>News</article>
       <article>News</article>
       <article>News</article>
@@ -42,6 +56,7 @@
 
     <footer></footer>
   </div>
+  <script src="assets/app.js"></script>
 </body>
 
 </html>
