@@ -5,21 +5,30 @@ const MENU_ITEMS = [
   "Roster"
 ]
 
-const today = moment().startOf('day').format();
-const endOfDay = moment().endOf('day').format();
+const today = moment().startOf( 'day' ).format();
+const endOfDay = moment().endOf( 'day' ).format();
 
-console.log(today)
-
-const CALENDAR_API_URL =
-  `https://www.googleapis.com/calendar/v3/calendars/hnng0croa7kvcpuv22ah54ea20@group.calendar.google.com/events?timeMin=${today}&timeMax=${endOfDay}`;
-const gapiInit = {
+const config = {
+  google: {
     'apiKey': 'AIzaSyB1LJJJWWayc8A6U-OLt_C4d4FG5bO78c8',
     'clientId': '337358217627-io7oq95ddglvt64ca2lkpj6o4iljce8s.apps.googleusercontent.com',
     'scope': 'https://www.googleapis.com/auth/calendar.readonly',
+  },
+
+  CALENDAR_API_URL: `https://www.googleapis.com/calendar/v3/calendars/hnng0croa7kvcpuv22ah54ea20@group.calendar.google.com/events?timeMin=${today}&timeMax=${endOfDay}`,
+
+  firebase: {
+    apiKey: "AIzaSyCUqhSGdAgu9aTTB4b4mIGaUoiWIuaqOTg",
+    authDomain: "alfred-1440e.firebaseapp.com",
+    databaseURL: "https://alfred-1440e.firebaseio.com",
+    projectId: "alfred-1440e",
+    storageBucket: "alfred-1440e.appspot.com",
+    messagingSenderId: "337358217627"
+  }
 }
 
-// const authorizeButton = document.getElementById('authorize-button');
-// const signoutButton = document.getElementById('signout-button');
+  // const authorizeButton = document.getElementById('authorize-button');
+  // const signoutButton = document.getElementById('signout-button');
 
 connectFirebaseDB();
 const db = firebase.database();
@@ -48,15 +57,7 @@ loadFromDB()
 /** FUNCTIONS **/
 
 function connectFirebaseDB() {
-  const config = {
-    apiKey: "AIzaSyCUqhSGdAgu9aTTB4b4mIGaUoiWIuaqOTg",
-    authDomain: "alfred-1440e.firebaseapp.com",
-    databaseURL: "https://alfred-1440e.firebaseio.com",
-    projectId: "alfred-1440e",
-    storageBucket: "alfred-1440e.appspot.com",
-    messagingSenderId: "337358217627"
-  };
-  firebase.initializeApp( config );
+  firebase.initializeApp( config.firebase );
 }
 
 function loadFromDB() {
@@ -95,8 +96,7 @@ function registerVueComponents() {
 }
 
 function seedLinks() {
-  const links = [
-    {
+  const links = [ {
       url: 'https://github.com/ian-deans',
       text: 'GitHub'
     },
@@ -142,15 +142,23 @@ function seedUser() {
 
 
 function loadGoogleClient() {
-  gapi.load( 'client:auth2', initClient );
+  gapi.load( 'client:auth2', initGoogleClient );
 }
 
-function initClient() {
-  gapi.client.init( gapiInit ).then( () =>
-    gapi.client.request( CALENDAR_API_URL ))
-  .then( response => {
-    console.log(response.result)
-  })
+function initGoogleClient() {
+  gapi.client.init( config.google )
+    .then( requestCalendarEvents )
+    .then( loadCalendarEvents )
+}
+
+function requestCalendarEvents() {
+  return gapi.client.request( config.CALENDAR_API_URL )
+}
+
+function loadCalendarEvents( apiResponse ) {
+  apiResponse.result.items.map( item => {
+    console.log( item );
+  });
 }
 
 function updateSigninStatus( isSignedIn ) {
@@ -173,17 +181,16 @@ function handleSignoutClick( event ) {
 }
 
 function listUpcomingEvents() {
-  console.log(gapi.client)
-  gapi.client.calendar.events.list({
+  console.log( gapi.client )
+  gapi.client.calendar.events.list( {
     'calendarId': 'primary',
     'showDeleted': false,
     'singleEvents': true,
     'maxResults': 10,
-  }).then( response => {
-    console.log( response )
+  } ).then( response => {
     let events = response.result.items;
     console.log( events )
-  })
+  } )
 }
 
 
